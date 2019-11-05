@@ -19,7 +19,7 @@ pub struct InvalidConfidenceError {
 
 impl fmt::Display for InvalidConfidenceError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "invald confidence level: {}", self.value)
+        write!(f, "invalid confidence level: {}", self.value)
     }
 }
 
