@@ -41,14 +41,11 @@ fn main() -> Result<(), Box<dyn error::Error>> {
         .get_matches();
 
     let confidence = matches.value_of("confidence").unwrap().try_into()?;
-
     let ctrl = read_file(matches.value_of("control").unwrap())?;
-    let ctrl_sum = Summary::of(&ctrl);
 
     for path in matches.values_of("experiments").unwrap() {
         let exp = read_file(path)?;
-        let exp_sum = Summary::of(&exp);
-        let diff = ctrl_sum.compare(&exp_sum, confidence);
+        let diff = ctrl.compare(&exp, confidence);
 
         println!("{}:", path);
         if diff.is_significant() {
@@ -68,10 +65,10 @@ fn main() -> Result<(), Box<dyn error::Error>> {
     Ok(())
 }
 
-fn read_file(path: &str) -> Result<Vec<f64>, Box<dyn std::error::Error>> {
+fn read_file(path: &str) -> Result<Summary, Box<dyn std::error::Error>> {
     let mut values = vec![];
     for l in io::BufReader::new(File::open(path)?).lines() {
         values.push(l?.parse()?);
     }
-    Ok(values)
+    Ok(Summary::of(&values))
 }
