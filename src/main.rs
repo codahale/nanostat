@@ -1,11 +1,10 @@
 extern crate structopt;
 
-use std::error;
+use std::error::Error;
 use std::fs::File;
-use std::io;
-use std::io::BufRead;
-
+use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
+
 use structopt::StructOpt;
 
 use nanostat::{Confidence, Summary};
@@ -43,7 +42,7 @@ struct Opt {
     confidence: Confidence,
 }
 
-fn main() -> Result<(), Box<dyn error::Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
     let opt = Opt::from_args();
 
     let ctrl = read_file(&opt.control)?;
@@ -69,9 +68,9 @@ fn main() -> Result<(), Box<dyn error::Error>> {
     Ok(())
 }
 
-fn read_file(path: &PathBuf) -> Result<Summary, Box<dyn std::error::Error>> {
+fn read_file(path: &PathBuf) -> Result<Summary, Box<dyn Error>> {
     let mut values = vec![];
-    for l in io::BufReader::new(File::open(path)?).lines() {
+    for l in BufReader::new(File::open(path)?).lines() {
         values.push(l?.parse()?);
     }
     Ok(Summary::of(&values))
