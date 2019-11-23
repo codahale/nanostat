@@ -1,6 +1,17 @@
-use std::error;
+use std::error::Error;
 use std::fmt;
 use std::str::FromStr;
+
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+pub struct InvalidConfidenceError(String);
+
+impl fmt::Display for InvalidConfidenceError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "invalid confidence level: {}", self.0)
+    }
+}
+
+impl Error for InvalidConfidenceError {}
 
 #[derive(Copy, Clone, Debug, Eq, Ord, PartialOrd, PartialEq)]
 pub enum Confidence {
@@ -11,19 +22,6 @@ pub enum Confidence {
     P99,
     P995,
 }
-
-#[derive(Clone, Debug)]
-pub struct InvalidConfidenceError {
-    pub value: String,
-}
-
-impl fmt::Display for InvalidConfidenceError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "invalid confidence level: {}", self.value)
-    }
-}
-
-impl error::Error for InvalidConfidenceError {}
 
 impl FromStr for Confidence {
     type Err = InvalidConfidenceError;
@@ -36,9 +34,7 @@ impl FromStr for Confidence {
             "P98" => Ok(Confidence::P98),
             "P99" => Ok(Confidence::P99),
             "P999" => Ok(Confidence::P99),
-            _ => Err(InvalidConfidenceError {
-                value: value.to_string(),
-            }),
+            _ => Err(InvalidConfidenceError(value.to_string())),
         }
     }
 }
