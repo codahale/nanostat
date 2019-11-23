@@ -1,6 +1,6 @@
-use std::convert::TryFrom;
 use std::error;
 use std::fmt;
+use std::str::FromStr;
 
 #[derive(Copy, Clone, Debug, Eq, Ord, PartialOrd, PartialEq)]
 pub enum Confidence {
@@ -25,10 +25,10 @@ impl fmt::Display for InvalidConfidenceError {
 
 impl error::Error for InvalidConfidenceError {}
 
-impl TryFrom<&str> for Confidence {
-    type Error = InvalidConfidenceError;
+impl FromStr for Confidence {
+    type Err = InvalidConfidenceError;
 
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
         match value {
             "P80" => Ok(Confidence::P80),
             "P90" => Ok(Confidence::P90),

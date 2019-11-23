@@ -1,55 +1,59 @@
-extern crate clap;
+extern crate structopt;
 
-use std::convert::TryInto;
 use std::error;
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
 
-use clap::{App, Arg};
+use std::path::PathBuf;
+use structopt::StructOpt;
 
-use nanostat::Summary;
+use nanostat::{Confidence, Summary};
 
-const VERSION: &str = env!("CARGO_PKG_VERSION");
+#[derive(Debug, StructOpt)]
+#[structopt(
+    name = "nanostat",
+    about = "Check for statistically valid differences between sets of measurements.",
+    version = env!("CARGO_PKG_VERSION"),
+)]
+struct Opt {
+    #[structopt(
+        name = "CONTROL",
+        help = "The path to a file with per-line floating point values",
+        required = true,
+        parse(from_os_str)
+    )]
+    control: PathBuf,
+
+    #[structopt(
+        name = "EXPERIMENT",
+        help = "The paths to one or more files with per-line floating point values",
+        required = true,
+        parse(from_os_str)
+    )]
+    experiments: Vec<PathBuf>,
+
+    #[structopt(
+        name = "P80|P90|P95|P98|P99|P999",
+        help = "The statistical confidence required",
+        short = "c",
+        long = "confidence",
+        default_value = "P95"
+    )]
+    confidence: Confidence,
+}
 
 fn main() -> Result<(), Box<dyn error::Error>> {
-    let matches = App::new("nanostat")
-        .about("Check for statistically valid differences between sets of measurements.")
-        .version(VERSION)
-        .arg(
-            Arg::with_name("control")
-                .value_name("CONTROL")
-                .help("The path to a file with per-line floating point values")
-                .required(true),
-        )
-        .arg(
-            Arg::with_name("confidence")
-                .short("c")
-                .long("confidence")
-                .value_name("PERCENTAGE")
-                .takes_value(true)
-                .default_value("P95"),
-        )
-        .arg(
-            Arg::with_name("experiments")
-                .value_name("EXPERIMENT")
-                .multiple(true)
-                .takes_value(true)
-                .help("The path to one or more files with per-line floating point values")
-                .required(true),
-        )
-        .get_matches();
+    let opt = Opt::from_args();
 
-    let confidence = matches.value_of("confidence").unwrap().try_into()?;
-    let ctrl = read_file(matches.value_of("control").unwrap())?;
+    let ctrl = read_file(&opt.control)?;
+    for path in opt.experiments {
+        let exp = read_file(&path)?;
+        let diff = ctrl.compare(&exp, opt.confidence);
 
-    for path in matches.values_of("experiments").unwrap() {
-        let exp = read_file(path)?;
-        let diff = ctrl.compare(&exp, confidence);
-
-        println!("{}:", path);
+        println!("{}:", path.to_string_lossy());
         if diff.is_significant() {
-            println!("\tDifference at {:?} confidence!", confidence);
+            println!("\tDifference at {:?} confidence!", opt.confidence);
             println!("\t\t{:.2} +/- {:.2}", diff.delta, diff.error);
             println!(
                 "\t\t{:.2}% +/- {:.2}%",
@@ -58,14 +62,14 @@ fn main() -> Result<(), Box<dyn error::Error>> {
             );
             println!("\t\tStudent's t, pooled s = {}\n", diff.std_dev);
         } else {
-            println!("\tNo difference at {:?} confidence.\n", confidence);
+            println!("\tNo difference at {:?} confidence.\n", opt.confidence);
         }
     }
 
     Ok(())
 }
 
-fn read_file(path: &str) -> Result<Summary, Box<dyn std::error::Error>> {
+fn read_file(path: &PathBuf) -> Result<Summary, Box<dyn std::error::Error>> {
     let mut values = vec![];
     for l in io::BufReader::new(File::open(path)?).lines() {
         values.push(l?.parse()?);
