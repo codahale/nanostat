@@ -111,23 +111,24 @@ impl Summary {
 #[cfg(test)]
 mod test {
     use crate::*;
+    use approx::assert_relative_eq;
 
     #[test]
     fn test_summarize_odd() {
         let s: Summary = vec![1.0, 2.0, 3.0].iter().collect();
 
-        assert_eq!(s.n, 3.0, "n");
-        assert_eq!(s.mean, 2.0, "mean");
-        assert_eq!(s.variance, 1.0, "variance");
+        assert_relative_eq!(s.n, 3.0);
+        assert_relative_eq!(s.mean, 2.0);
+        assert_relative_eq!(s.variance, 1.0);
     }
 
     #[test]
     fn test_summarize_even() {
         let s: Summary = vec![1.0, 2.0, 3.0, 4.0].iter().collect();
 
-        assert_eq!(s.n, 4.0, "n");
-        assert_eq!(s.mean, 2.5, "mean");
-        assert_eq!(s.variance, 1.6666666666666667, "variance");
+        assert_relative_eq!(s.n, 4.0);
+        assert_relative_eq!(s.mean, 2.5);
+        assert_relative_eq!(s.variance, 1.6666666666666667);
     }
 
     #[test]
@@ -136,11 +137,11 @@ mod test {
         let b: Summary = vec![1.0, 2.0, 3.0, 4.0].iter().collect();
         let diff = a.compare(&b, Confidence::P80);
 
-        assert_eq!(diff.delta, 0.0, "delta");
-        assert_eq!(diff.error, 1.3145341380123987, "error");
-        assert_eq!(diff.rel_delta, 0.0, "rel_delta");
-        assert_eq!(diff.rel_error, 0.5258136552049595, "rel_error");
-        assert_eq!(diff.std_dev, 1.2909944487358056, "std_dev");
+        assert_relative_eq!(diff.delta, 0.0);
+        assert_relative_eq!(diff.error, 1.3145341380123987);
+        assert_relative_eq!(diff.rel_delta, 0.0);
+        assert_relative_eq!(diff.rel_error, 0.5258136552049595);
+        assert_relative_eq!(diff.std_dev, 1.2909944487358056);
         assert!(!diff.is_significant(), "significant");
     }
 
@@ -150,11 +151,11 @@ mod test {
         let b: Summary = vec![10.0, 20.0, 30.0, 40.0].iter().collect();
         let diff = a.compare(&b, Confidence::P80);
 
-        assert_eq!(diff.delta, 22.5, "delta");
-        assert_eq!(diff.error, 9.341520218893711, "error");
-        assert_eq!(diff.rel_delta, 9.0, "rel_delta");
-        assert_eq!(diff.rel_error, 3.7366080875574843, "rel_error");
-        assert_eq!(diff.std_dev, 9.17423929634859, "std_dev");
+        assert_relative_eq!(diff.delta, 22.5);
+        assert_relative_eq!(diff.error, 9.341520218893711);
+        assert_relative_eq!(diff.rel_delta, 9.0);
+        assert_relative_eq!(diff.rel_error, 3.7366080875574843);
+        assert_relative_eq!(diff.std_dev, 9.17423929634859);
         assert!(diff.is_significant(), "significant");
     }
 
