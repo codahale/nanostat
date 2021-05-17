@@ -73,5 +73,5 @@ fn read_file(path: &Path) -> Result<Summary, Box<dyn Error>> {
     for l in BufReader::new(File::open(path)?).lines() {
         values.push(l?.parse()?);
     }
-    Ok(Summary::of(&values))
+    Ok(values.iter().collect())
 }

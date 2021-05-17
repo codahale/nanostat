@@ -1,5 +1,6 @@
 use std::error::Error;
 use std::fmt;
+use std::iter::FromIterator;
 use std::str::FromStr;
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
@@ -62,13 +63,13 @@ pub struct Summary {
     pub variance: f64,
 }
 
-impl Summary {
-    pub fn of(values: &[f64]) -> Summary {
+impl<'a> FromIterator<&'a f64> for Summary {
+    fn from_iter<T: IntoIterator<Item = &'a f64>>(iter: T) -> Self {
         // Welford algorithm for corrected variance
         let mut mean = 0.0;
         let mut m2 = 0.0;
         let mut n = 0.0;
-        for x in values {
+        for x in iter {
             n += 1.0;
             let delta = x - mean;
             mean += delta / n;
@@ -80,7 +81,9 @@ impl Summary {
             variance: m2 / (n - 1.0), // Bessel's correction
         }
     }
+}
 
+impl Summary {
     pub fn compare(&self, other: &Summary, confidence: Confidence) -> Difference {
         let a = self.n - 1.0;
         let b = other.n - 1.0;
@@ -111,7 +114,7 @@ mod test {
 
     #[test]
     fn test_summarize_odd() {
-        let s = Summary::of(&vec![1.0, 2.0, 3.0]);
+        let s: Summary = vec![1.0, 2.0, 3.0].iter().collect();
 
         assert_eq!(s.n, 3.0, "n");
         assert_eq!(s.mean, 2.0, "mean");
@@ -120,7 +123,7 @@ mod test {
 
     #[test]
     fn test_summarize_even() {
-        let s = Summary::of(&vec![1.0, 2.0, 3.0, 4.0]);
+        let s: Summary = vec![1.0, 2.0, 3.0, 4.0].iter().collect();
 
         assert_eq!(s.n, 4.0, "n");
         assert_eq!(s.mean, 2.5, "mean");
@@ -129,8 +132,8 @@ mod test {
 
     #[test]
     fn test_compare_similar_data() {
-        let a = Summary::of(&vec![1.0, 2.0, 3.0, 4.0]);
-        let b = Summary::of(&vec![1.0, 2.0, 3.0, 4.0]);
+        let a: Summary = vec![1.0, 2.0, 3.0, 4.0].iter().collect();
+        let b: Summary = vec![1.0, 2.0, 3.0, 4.0].iter().collect();
         let diff = a.compare(&b, Confidence::P80);
 
         assert_eq!(diff.delta, 0.0, "delta");
@@ -143,8 +146,8 @@ mod test {
 
     #[test]
     fn test_compare_different_data() {
-        let a = Summary::of(&vec![1.0, 2.0, 3.0, 4.0]);
-        let b = Summary::of(&vec![10.0, 20.0, 30.0, 40.0]);
+        let a: Summary = vec![1.0, 2.0, 3.0, 4.0].iter().collect();
+        let b: Summary = vec![10.0, 20.0, 30.0, 40.0].iter().collect();
         let diff = a.compare(&b, Confidence::P80);
 
         assert_eq!(diff.delta, 22.5, "delta");
@@ -169,7 +172,7 @@ mod test {
 /// Student's T critical values for two-tailed tests at α=0.2, 0.1, 0.05, 0.01, and 0.005, for
 /// degrees of freedom from 1 to 100. 0th row is the normal approximation for dof>100.
 #[allow(clippy::approx_constant)]
-static STUDENT: [[f64; (Confidence::P995 as usize) + 1]; 101] = [
+static STUDENT: [[f64; 6]; 101] = [
     /*   ∞. */ [1.282, 1.645, 1.960, 2.326, 2.576, 3.090],
     /*   1. */ [3.078, 6.314, 12.706, 31.821, 63.657, 318.313],
     /*   2. */ [1.886, 2.920, 4.303, 6.965, 9.925, 22.327],
