@@ -3,7 +3,7 @@ extern crate structopt;
 use std::error::Error;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use structopt::StructOpt;
 
@@ -68,7 +68,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn read_file(path: &PathBuf) -> Result<Summary, Box<dyn Error>> {
+fn read_file(path: &Path) -> Result<Summary, Box<dyn Error>> {
     let mut values = vec![];
     for l in BufReader::new(File::open(path)?).lines() {
         values.push(l?.parse()?);
