@@ -9,7 +9,7 @@ structopt = "0.3"
 
 [dev-dependencies]
 approx = "0.4"
-criterion = "0.3"
+criterion = { version = "0.3", features = ["html_reports"] }
 
 [[bench]]
 name = "benches"
