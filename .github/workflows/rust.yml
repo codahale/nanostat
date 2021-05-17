@@ -1,0 +1,58 @@
+name: Rust CI
+
+on:
+  push:
+    branches: [ 'main' ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust:
+          - stable
+          - beta
+    steps:
+      - uses: actions/checkout@v2.3.4
+        name: "checkout"
+      - uses: actions-rs/toolchain@v1.0.7
+        name: "install rust"
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
+      - uses: actions-rs/cargo@v1.0.3
+        name: 'build'
+        with:
+          command: build
+          args: --all-targets ${{ matrix.features }}
+      - uses: actions-rs/cargo@v1.0.3
+        name: 'test'
+        with:
+          command: test
+          args: ${{ matrix.features }}
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.3.4
+        name: "checkout"
+      - uses: actions-rs/toolchain@v1.0.7
+        name: "install rust"
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          components: rustfmt, clippy
+      - uses: actions-rs/cargo@v1.0.3
+        name: 'rustfmt'
+        with:
+          command: fmt
+          args: --all -- --check
+      - uses: actions-rs/cargo@v1.0.3
+        name: 'clippy'
+        if: always()
+        with:
+          command: clippy
+          args: --all-features -- -D warnings
