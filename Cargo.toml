@@ -5,11 +5,11 @@ authors = ["Coda Hale <coda.hale@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-structopt = "^0.3"
+structopt = "0.3"
 
 [dev-dependencies]
 approx = "0.4"
-criterion = "^0.3"
+criterion = "0.3"
 
 [[bench]]
 name = "benches"
