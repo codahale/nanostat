@@ -5,11 +5,8 @@ Like ministat, but smaller?
 ```
 $ nanostat examples/iguana examples/leopard examples/chameleon 
 examples/leopard:
-	Difference at P95 confidence!
-		343.50 +/- 292.64
-		114.50% +/- 97.55%
-		Student's t, pooled s = 238.9799344943192
-
+	Difference at 95 confidence!
+		643.50 > 300.00 ± 293.97, p = 0.026080480978720635
 examples/chameleon:
-	No difference at P95 confidence.
+	No difference at 95.0 confidence.
 ```

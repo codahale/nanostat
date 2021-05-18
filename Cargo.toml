@@ -6,6 +6,7 @@ edition = "2018"
 
 [dependencies]
 structopt = "0.3"
+statrs = "0.14"
 
 [dev-dependencies]
 approx = "0.4"

@@ -7,13 +7,13 @@ use std::path::{Path, PathBuf};
 
 use structopt::StructOpt;
 
-use nanostat::{Confidence, Summary};
+use nanostat::Summary;
 
 #[derive(Debug, StructOpt)]
 #[structopt(
-    name = "nanostat",
-    about = "Check for statistically valid differences between sets of measurements.",
-    version = env!("CARGO_PKG_VERSION"),
+name = "nanostat",
+about = "Check for statistically valid differences between sets of measurements.",
+version = env ! ("CARGO_PKG_VERSION"),
 )]
 struct Opt {
     #[structopt(
@@ -33,13 +33,12 @@ struct Opt {
     experiments: Vec<PathBuf>,
 
     #[structopt(
-        name = "P80|P90|P95|P98|P99|P999",
-        help = "The statistical confidence required",
+        help = "The statistical confidence required [0,100)",
         short = "c",
         long = "confidence",
-        default_value = "P95"
+        default_value = "95"
     )]
-    confidence: Confidence,
+    confidence: f64,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -52,14 +51,15 @@ fn main() -> Result<(), Box<dyn Error>> {
 
         println!("{}:", path.to_string_lossy());
         if diff.is_significant() {
-            println!("\tDifference at {:?} confidence!", opt.confidence);
-            println!("\t\t{:.2} +/- {:.2}", diff.delta, diff.error);
+            let p = format!("{:.3}", diff.p_value);
+            let p = p.trim_start_matches('0');
+            let op = if exp.mean < ctrl.mean { "<" } else { ">" };
+
+            println!("\tDifference at {} confidence!", opt.confidence);
             println!(
-                "\t\t{:.2}% +/- {:.2}%",
-                diff.rel_delta * 100.0,
-                diff.rel_error * 100.0
+                "\t\t{:.2} {} {:.2} ± {:.2}, p = {}",
+                exp.mean, op, ctrl.mean, diff.critical_value, p,
             );
-            println!("\t\tStudent's t, pooled s = {}\n", diff.std_dev);
         } else {
             println!("\tNo difference at {:?} confidence.\n", opt.confidence);
         }
