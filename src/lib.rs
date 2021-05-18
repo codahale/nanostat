@@ -1,27 +1,64 @@
+//! nanostat compares data sets using Welch's t-test at various levels of confidence.
+
+#![forbid(unsafe_code)]
+#![warn(
+    missing_docs,
+    rust_2018_idioms,
+    trivial_casts,
+    unused_lifetimes,
+    unused_qualifications,
+    missing_copy_implementations,
+    missing_debug_implementations,
+    clippy::cognitive_complexity,
+    clippy::missing_const_for_fn,
+    clippy::needless_borrow
+)]
+
 use std::iter::FromIterator;
 
 use statrs::distribution::{ContinuousCDF, Normal, StudentsT};
 
+/// The statistical difference between two [Summary] instances.
 #[derive(Copy, Clone, Debug)]
 pub struct Difference {
+    /// The absolute difference between the samples' means.
     pub effect: f64,
+
+    /// The difference in means between the two samples, normalized for variance. Technically, this
+    /// is Cohen's d.
     pub effect_size: f64,
+
+    /// The minimum allowed effect at the given confidence level.
     pub critical_value: f64,
+
+    /// The p-value for the test: the probability that accepting the results of this test will be a
+    /// Type 1 error, in which the null hypothesis (i.e. there is no difference between the means of
+    /// the two samples) will be rejected when it is in fact true.
     pub p_value: f64,
+
+    /// The significance level of the test. It is the maximum allowed value of the p-value.
     pub alpha: f64,
+
+    /// The probability of a Type 2 error: the probability that the null hypothesis will be retained
+    /// despite it not being true.
     pub beta: f64,
 }
 
 impl Difference {
+    /// Whether or not the difference is statistically significant.
     pub fn is_significant(&self) -> bool {
         self.effect > self.critical_value
     }
 }
 
-#[derive(Copy, Clone, Debug, Default)]
+/// A statistical summary of a normally distributed data set.
+#[derive(Copy, Clone, Debug)]
 pub struct Summary {
+    /// The number of measurements in the set.
     pub n: f64,
+    /// The arithmetic mean of the measurements.
     pub mean: f64,
+    /// The sample variance of the data set.
     pub variance: f64,
 }
 
@@ -46,10 +83,22 @@ impl<'a> FromIterator<&'a f64> for Summary {
 }
 
 impl Summary {
+    /// The standard deviation of the sample.
+    pub fn std_dev(&self) -> f64 {
+        self.variance.sqrt()
+    }
+
+    /// The standard error of the sample.
+    pub fn std_err(&self) -> f64 {
+        self.std_dev() / self.n.sqrt()
+    }
+
+    /// Calculate the statistical difference between the two summaries using a two-tailed Welch's
+    /// t-test. The confidence level must be in the range `(0, 100)`.
     pub fn compare(&self, other: &Summary, confidence: f64) -> Difference {
         assert!(
             (0.0..100.0).contains(&confidence),
-            "confidence must be [0,100)"
+            "confidence must be (0,100)"
         );
 
         let (a, b) = (self, other);
@@ -109,6 +158,8 @@ impl Summary {
     }
 }
 
+/// The number of distribution tails used to determine significance. In this case, we always use a
+/// two-tailed test because our null hypothesis is that the samples are not different.
 const TAILS: f64 = 2.0;
 
 #[cfg(test)]

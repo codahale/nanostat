@@ -33,7 +33,7 @@ struct Opt {
     experiments: Vec<PathBuf>,
 
     #[structopt(
-        help = "The statistical confidence required [0,100)",
+        help = "The statistical confidence required (0,100)",
         short = "c",
         long = "confidence",
         default_value = "95"
