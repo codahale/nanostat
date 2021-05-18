@@ -65,18 +65,15 @@ pub struct Summary {
 impl<'a> FromIterator<&'a f64> for Summary {
     fn from_iter<T: IntoIterator<Item = &'a f64>>(iter: T) -> Self {
         // Welford's one-pass algorithm for corrected variance
-        let (mut m, mut s, mut n) = (0.0, 0.0, 0.0);
+        let (mut mean, mut s, mut n) = (0.0, 0.0, 0.0);
         for x in iter {
             n += 1.0;
-            let delta = x - m;
-            m += delta / n;
-            s += delta * (x - m);
+            let delta = x - mean;
+            mean += delta / n;
+            s += delta * (x - mean);
         }
-        Summary {
-            n,
-            mean: m,
-            variance: s / (n - 1.0), // Bessel's correction
-        }
+        let variance = s / (n - 1.0); // Bessel's correction
+        Summary { n, mean, variance }
     }
 }
 
