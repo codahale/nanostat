@@ -4,8 +4,12 @@ version = "0.1.0"
 authors = ["Coda Hale <coda.hale@gmail.com>"]
 edition = "2018"
 
+[features]
+default = ["cli"]
+cli = ["argh"]
+
 [dependencies]
-structopt = "0.3"
+argh = { version = "0.1", optional = true }
 statrs = "0.14"
 
 [dev-dependencies]

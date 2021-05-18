@@ -1,55 +1,45 @@
-extern crate structopt;
-
 use std::error::Error;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::path::{Path, PathBuf};
 
-use structopt::StructOpt;
+use argh::FromArgs;
 
 use nanostat::Summary;
 
-#[derive(Debug, StructOpt)]
-#[structopt(
-name = "nanostat",
-about = "Check for statistically valid differences between sets of measurements.",
-version = env ! ("CARGO_PKG_VERSION"),
-)]
+#[derive(Debug, FromArgs)]
+#[argh(description = "check for statistically valid differences between sets of measurements")]
 struct Opt {
-    #[structopt(
-        name = "CONTROL",
-        help = "The path to a file with per-line floating point values",
-        required = true,
-        parse(from_os_str)
+    #[argh(
+        positional,
+        description = "the path to a file with per-line floating point values"
     )]
-    control: PathBuf,
+    control: String,
 
-    #[structopt(
-        name = "EXPERIMENT",
-        help = "The paths to one or more files with per-line floating point values",
-        required = true,
-        parse(from_os_str)
+    #[argh(
+        positional,
+        description = "the paths to one or more files with per-line floating point values"
     )]
-    experiments: Vec<PathBuf>,
+    experiments: Vec<String>,
 
-    #[structopt(
-        help = "The statistical confidence required (0,100)",
-        short = "c",
+    #[argh(
+        option,
+        short = 'c',
         long = "confidence",
-        default_value = "95"
+        description = "the statistical confidence required (0,100)",
+        default = "95.0"
     )]
     confidence: f64,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let opt = Opt::from_args();
+    let opt: Opt = argh::from_env();
 
     let ctrl = read_file(&opt.control)?;
     for path in opt.experiments {
         let exp = read_file(&path)?;
         let diff = ctrl.compare(&exp, opt.confidence);
 
-        println!("{}:", path.to_string_lossy());
+        println!("{}:", path);
         if diff.is_significant() {
             let p = format!("{:.3}", diff.p_value);
             let p = p.trim_start_matches('0');
@@ -68,7 +58,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn read_file(path: &Path) -> Result<Summary, Box<dyn Error>> {
+fn read_file(path: &str) -> Result<Summary, Box<dyn Error>> {
     let mut values = vec![];
     for l in BufReader::new(File::open(path)?).lines() {
         values.push(l?.parse()?);

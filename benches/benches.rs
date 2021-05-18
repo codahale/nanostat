@@ -13,9 +13,7 @@ fn compare(c: &mut Criterion) {
     let s1: Summary = vec![0.0; 10].iter().collect();
     let s2: Summary = vec![0.1; 10].iter().collect();
 
-    c.bench_function("compare", move |b| {
-        b.iter(|| s1.compare(&s2, 98.0))
-    });
+    c.bench_function("compare", move |b| b.iter(|| s1.compare(&s2, 98.0)));
 }
 
 criterion_group!(benches, summarize, compare);

@@ -166,7 +166,7 @@ const TAILS: f64 = 2.0;
 mod test {
     use approx::assert_relative_eq;
 
-    use crate::*;
+    use super::*;
 
     #[test]
     fn test_summarize_odd() {
