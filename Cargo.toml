@@ -3,6 +3,13 @@ name = "nanostat"
 version = "0.1.0"
 authors = ["Coda Hale <coda.hale@gmail.com>"]
 edition = "2018"
+license = "MIT OR Apache-2.0"
+description = "nanostat compares data sets using Welch's t-test at various levels of confidence."
+homepage = "https://github.com/codahale/nanostat"
+documentation = "https://docs.rs/nanostat/"
+keywords = ["statistics"]
+readme = "README.md"
+include = ["Cargo.toml", "benches/**/*.rs", "src/**/*.rs", "tests/**/*.rs", "README.md", "LICENSE-APACHE", "LICENSE-MIT"]
 
 [features]
 default = []
