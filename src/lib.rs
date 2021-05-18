@@ -52,6 +52,12 @@ impl Difference {
 }
 
 /// A statistical summary of a normally distributed data set.
+///
+/// Created from an iterable of `f64`s:
+///
+/// ```
+/// let summary: nanostat::Summary = vec![0.1, 0.45, 0.42].iter().collect();
+/// ```
 #[derive(Copy, Clone, Debug)]
 pub struct Summary {
     /// The number of measurements in the set.
