@@ -15,3 +15,15 @@ examples/leopard:
 examples/chameleon:
 	No difference at 95% confidence.
 ```
+
+## Install
+
+```
+cargo install nanostat --features cli
+```
+
+## License
+
+Copyright © 2021 Coda Hale
+
+Distributed under the Apache License 2.0 or the MIT license.
