@@ -20,3 +20,7 @@ criterion = { version = "0.3", features = ["html_reports"] }
 [[bench]]
 name = "benches"
 harness = false
+
+[[bin]]
+name = "nanostat"
+required-features = ["cli"]
