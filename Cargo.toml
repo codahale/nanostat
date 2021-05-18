@@ -5,7 +5,7 @@ authors = ["Coda Hale <coda.hale@gmail.com>"]
 edition = "2018"
 
 [features]
-default = ["cli"]
+default = []
 cli = ["argh", "plotlib"]
 
 [dependencies]
