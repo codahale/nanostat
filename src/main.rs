@@ -14,10 +14,7 @@ use plotlib::view::CategoricalView;
 #[derive(Debug, FromArgs)]
 #[argh(description = "check for statistically valid differences between sets of measurements")]
 struct Opt {
-    #[argh(
-        positional,
-        description = "the path to a file with per-line floating point values"
-    )]
+    #[argh(positional, description = "the path to a file with per-line floating point values")]
     control: String,
 
     #[argh(
@@ -35,11 +32,7 @@ struct Opt {
     )]
     confidence: f64,
 
-    #[argh(
-        option,
-        long = "box-plot",
-        description = "write an SVG box plot to the given path"
-    )]
+    #[argh(option, long = "box-plot", description = "write an SVG box plot to the given path")]
     box_plot: Option<String>,
 }
 

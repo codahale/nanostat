@@ -4,9 +4,7 @@ use nanostat::Summary;
 
 fn summarize(c: &mut Criterion) {
     let v = vec![0.0; 1000];
-    c.bench_function("summarize", move |b| {
-        b.iter(|| v.iter().collect::<Summary>())
-    });
+    c.bench_function("summarize", move |b| b.iter(|| v.iter().collect::<Summary>()));
 }
 
 fn compare(c: &mut Criterion) {

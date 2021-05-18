@@ -94,10 +94,7 @@ impl Summary {
     /// Calculate the statistical difference between the two summaries using a two-tailed Welch's
     /// t-test. The confidence level must be in the range `(0, 100)`.
     pub fn compare(&self, other: &Summary, confidence: f64) -> Difference {
-        assert!(
-            0.0 < confidence && confidence < 100.0,
-            "confidence must be (0,100)"
-        );
+        assert!(0.0 < confidence && confidence < 100.0, "confidence must be (0,100)");
 
         let (a, b) = (self, other);
 
@@ -143,14 +140,7 @@ impl Summary {
         let za = dist_norm.inverse_cdf(1.0 - alpha / TAILS);
         let beta = dist_norm.cdf(z - za) - dist_norm.cdf(-z - za);
 
-        Difference {
-            effect,
-            effect_size,
-            critical_value,
-            p_value,
-            alpha,
-            beta,
-        }
+        Difference { effect, effect_size, critical_value, p_value, alpha, beta }
     }
 }
 
