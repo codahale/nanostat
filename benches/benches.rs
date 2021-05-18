@@ -1,6 +1,3 @@
-extern crate criterion;
-extern crate nanostat;
-
 use criterion::{criterion_group, criterion_main, Criterion};
 
 use nanostat::Summary;
@@ -17,7 +14,7 @@ fn compare(c: &mut Criterion) {
     let s2: Summary = vec![0.1; 10].iter().collect();
 
     c.bench_function("compare", move |b| {
-        b.iter(|| s1.compare(&s2, nanostat::Confidence::P98))
+        b.iter(|| s1.compare(&s2, 98.0))
     });
 }
 
