@@ -152,7 +152,7 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_summarize_odd() {
+    fn summarize_odd() {
         let s: Summary = vec![1.0, 2.0, 3.0].iter().collect();
 
         assert_relative_eq!(s.n, 3.0);
@@ -161,7 +161,7 @@ mod test {
     }
 
     #[test]
-    fn test_summarize_even() {
+    fn summarize_even() {
         let s: Summary = vec![1.0, 2.0, 3.0, 4.0].iter().collect();
 
         assert_relative_eq!(s.n, 4.0);
@@ -170,7 +170,7 @@ mod test {
     }
 
     #[test]
-    fn test_compare_similar_data() {
+    fn compare_similar_data() {
         let a: Summary = vec![1.0, 2.0, 3.0, 4.0].iter().collect();
         let b: Summary = vec![1.0, 2.0, 3.0, 4.0].iter().collect();
         let diff = a.compare(&b, 80.0);
@@ -185,7 +185,7 @@ mod test {
     }
 
     #[test]
-    fn test_compare_different_data() {
+    fn compare_different_data() {
         let a: Summary = vec![1.0, 2.0, 3.0, 4.0].iter().collect();
         let b: Summary = vec![10.0, 20.0, 30.0, 40.0].iter().collect();
         let diff = a.compare(&b, 80.0);
