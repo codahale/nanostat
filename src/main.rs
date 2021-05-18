@@ -45,13 +45,13 @@ fn main() -> Result<(), Box<dyn Error>> {
             let p = p.trim_start_matches('0');
             let op = if exp.mean < ctrl.mean { "<" } else { ">" };
 
-            println!("\tDifference at {} confidence!", opt.confidence);
+            println!("\tDifference at {}% confidence!", opt.confidence);
             println!(
                 "\t\t{:.2} {} {:.2} ± {:.2}, p = {}",
                 exp.mean, op, ctrl.mean, diff.critical_value, p,
             );
         } else {
-            println!("\tNo difference at {:?} confidence.\n", opt.confidence);
+            println!("\tNo difference at {}% confidence.\n", opt.confidence);
         }
     }
 
