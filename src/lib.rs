@@ -139,11 +139,9 @@ impl Summary {
         // Calculate Cohen's d for the effect size.
         let effect_size = effect / std_dev;
 
-        // Create a unit normal distribution.
-        let dist_norm = Normal::new(0.0, 1.0).unwrap();
-
         // Calculate the statistical power.
         let z = effect / (std_dev * (1.0 / a.n + 1.0 / b.n).sqrt());
+        let dist_norm = Normal::new(0.0, 1.0).unwrap();
         let za = dist_norm.inverse_cdf(1.0 - alpha / TAILS);
         let beta = dist_norm.cdf(z - za) - dist_norm.cdf(-z - za);
 

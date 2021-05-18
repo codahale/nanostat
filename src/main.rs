@@ -5,6 +5,9 @@ use std::io::{BufRead, BufReader};
 use argh::FromArgs;
 
 use nanostat::Summary;
+use plotlib::page::Page;
+use plotlib::repr::BoxPlot;
+use plotlib::view::CategoricalView;
 
 #[derive(Debug, FromArgs)]
 #[argh(description = "check for statistically valid differences between sets of measurements")]
@@ -29,14 +32,27 @@ struct Opt {
         default = "95.0"
     )]
     confidence: f64,
+
+    #[argh(
+        option,
+        long = "box-plot",
+        description = "write an SVG box plot to the given path"
+    )]
+    box_plot: Option<String>,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
     let opt: Opt = argh::from_env();
 
-    let ctrl = read_file(&opt.control)?;
+    let mut plots = CategoricalView::new();
+
+    let (ctrl_data, ctrl) = read_file(&opt.control)?;
+    plots = plots.add(BoxPlot::from_vec(ctrl_data).label(&opt.control));
+
     for path in opt.experiments {
-        let exp = read_file(&path)?;
+        let (exp_data, exp) = read_file(&path)?;
+        plots = plots.add(BoxPlot::from_vec(exp_data).label(&path));
+
         let diff = ctrl.compare(&exp, opt.confidence);
 
         println!("{}:", path);
@@ -55,13 +71,18 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     }
 
+    if let Some(path) = opt.box_plot {
+        Page::single(&plots).save(&path)?;
+    }
+
     Ok(())
 }
 
-fn read_file(path: &str) -> Result<Summary, Box<dyn Error>> {
+fn read_file(path: &str) -> Result<(Vec<f64>, Summary), Box<dyn Error>> {
     let mut values = vec![];
     for l in BufReader::new(File::open(path)?).lines() {
         values.push(l?.parse()?);
     }
-    Ok(values.iter().collect())
+    let summary = values.iter().collect();
+    Ok((values, summary))
 }
