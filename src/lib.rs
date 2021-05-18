@@ -95,7 +95,7 @@ impl Summary {
     /// t-test. The confidence level must be in the range `(0, 100)`.
     pub fn compare(&self, other: &Summary, confidence: f64) -> Difference {
         assert!(
-            (0.0..100.0).contains(&confidence),
+            0.0 < confidence && confidence < 100.0,
             "confidence must be (0,100)"
         );
 
