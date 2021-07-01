@@ -18,7 +18,7 @@ cli = ["argh", "plotlib"]
 [dependencies]
 argh = { version = "0.1", optional = true }
 plotlib = { version = "0.5", optional = true }
-statrs = "0.14"
+statrs = "0.15"
 
 [dev-dependencies]
 approx = "0.5"
