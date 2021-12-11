@@ -1,54 +1,50 @@
 use std::error::Error;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use std::path::{Path, PathBuf};
 
-use argh::FromArgs;
-
-use nanostat::Summary;
+use clap::{Parser, ValueHint};
 use plotlib::page::Page;
 use plotlib::repr::BoxPlot;
 use plotlib::view::CategoricalView;
 
-#[derive(Debug, FromArgs)]
-#[argh(description = "check for statistically valid differences between sets of measurements")]
+use nanostat::Summary;
+
+/// Check for statistically valid differences between sets of measurements.
+#[derive(Debug, Parser)]
 struct Opt {
-    #[argh(positional, description = "the path to a file with per-line floating point values")]
-    control: String,
+    /// The path to a file with per-line floating point values.
+    #[clap(value_hint = ValueHint::FilePath)]
+    control: PathBuf,
 
-    #[argh(
-        positional,
-        description = "the paths to one or more files with per-line floating point values"
-    )]
-    experiments: Vec<String>,
+    /// The paths to one or more files with per-line floating point values.
+    #[clap(value_hint = ValueHint::FilePath)]
+    experiments: Vec<PathBuf>,
 
-    #[argh(
-        option,
-        short = 'c',
-        long = "confidence",
-        description = "the statistical confidence required (0,100)",
-        default = "95.0"
-    )]
+    /// The statistical confidence required (0,100).
+    #[clap(short = 'c', long, default_value = "95.0")]
     confidence: f64,
 
-    #[argh(option, long = "box-plot", description = "write an SVG box plot to the given path")]
+    /// Write an SVG box plot to the given path.
+    #[clap(long, value_hint = ValueHint::FilePath, value_name = "PATH")]
     box_plot: Option<String>,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let opt: Opt = argh::from_env();
+    let opt: Opt = Opt::parse();
 
     let mut plots = CategoricalView::new();
 
     let (ctrl_data, ctrl) = read_file(&opt.control)?;
-    plots = plots.add(BoxPlot::from_vec(ctrl_data).label(&opt.control));
+    plots = plots.add(BoxPlot::from_vec(ctrl_data).label(opt.control.to_string_lossy()));
 
     for path in opt.experiments {
         let (exp_data, exp) = read_file(&path)?;
-        plots = plots.add(BoxPlot::from_vec(exp_data).label(&path));
+        plots = plots.add(BoxPlot::from_vec(exp_data).label(path.to_string_lossy()));
 
         let diff = ctrl.compare(&exp, opt.confidence);
 
-        println!("{}:", path);
+        println!("{}:", path.to_string_lossy());
         if diff.is_significant() {
             let p = format!("{:.3}", diff.p_value);
             let p = p.trim_start_matches('0');
@@ -71,7 +67,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn read_file(path: &str) -> Result<(Vec<f64>, Summary), Box<dyn Error>> {
+fn read_file(path: &Path) -> Result<(Vec<f64>, Summary), Box<dyn Error>> {
     let mut values = vec![];
     for l in BufReader::new(File::open(path)?).lines() {
         values.push(l?.parse()?);
