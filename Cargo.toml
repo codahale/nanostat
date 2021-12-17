@@ -16,7 +16,7 @@ default = []
 cli = ["clap", "plotlib"]
 
 [dependencies]
-clap = { version = "3.0.0-rc.5", optional = true, features = ["derive"] }
+clap = { version = "3.0.0-rc.7", optional = true, features = ["derive"] }
 plotlib = { version = "0.5", optional = true }
 statrs = "0.15"
 
