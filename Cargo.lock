@@ -447,7 +447,7 @@ dependencies = [
 
 [[package]]
 name = "nanostat"
-version = "0.2.0"
+version = "0.2.1-alpha.0"
 dependencies = [
  "approx",
  "clap 3.0.0",
