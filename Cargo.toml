@@ -9,7 +9,7 @@ homepage = "https://github.com/codahale/nanostat"
 documentation = "https://docs.rs/nanostat/"
 keywords = ["statistics"]
 readme = "README.md"
-include = ["Cargo.toml", "benches/**/*.rs", "src/**/*.rs", "tests/**/*.rs", "README.md", "LICENSE-APACHE", "LICENSE-MIT"]
+include = ["benches/**/*.rs", "src/**/*.rs", "tests/**/*.rs", "README.md", "LICENSE-APACHE", "LICENSE-MIT"]
 
 [features]
 default = []
