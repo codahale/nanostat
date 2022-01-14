@@ -46,6 +46,7 @@ pub struct Difference {
 
 impl Difference {
     /// Whether or not the difference is statistically significant.
+    #[must_use]
     pub fn is_significant(&self) -> bool {
         self.effect > self.critical_value
     }
@@ -85,17 +86,20 @@ impl<'a> FromIterator<&'a f64> for Summary {
 
 impl Summary {
     /// The standard deviation of the sample.
+    #[must_use]
     pub fn std_dev(&self) -> f64 {
         self.variance.sqrt()
     }
 
     /// The standard error of the sample.
+    #[must_use]
     pub fn std_err(&self) -> f64 {
         self.std_dev() / self.n.sqrt()
     }
 
     /// Calculate the statistical difference between the two summaries using a two-tailed Welch's
     /// t-test. The confidence level must be in the range `(0, 100)`.
+    #[must_use]
     pub fn compare(&self, other: &Summary, confidence: f64) -> Difference {
         assert!(0.0 < confidence && confidence < 100.0, "confidence must be (0,100)");
 
