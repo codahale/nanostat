@@ -191,7 +191,7 @@ mod test {
         assert_relative_eq!(diff.p_value, 1.0);
         assert_relative_eq!(diff.alpha, 0.19999999999999996);
         assert_relative_eq!(diff.beta, 0.0);
-        assert_eq!(diff.is_significant(), false);
+        assert!(!diff.is_significant());
     }
 
     #[test]
@@ -206,6 +206,6 @@ mod test {
         assert_relative_eq!(diff.p_value, 0.03916791618893325);
         assert_relative_eq!(diff.alpha, 0.19999999999999996);
         assert_relative_eq!(diff.beta, 0.985621684277956);
-        assert_eq!(diff.is_significant(), true);
+        assert!(diff.is_significant());
     }
 }
