@@ -14,19 +14,19 @@ use nanostat::Summary;
 #[derive(Debug, Parser)]
 struct Opt {
     /// The path to a file with per-line floating point values.
-    #[clap(value_hint = ValueHint::FilePath)]
+    #[clap(action, value_hint = ValueHint::FilePath)]
     control: PathBuf,
 
     /// The paths to one or more files with per-line floating point values.
-    #[clap(value_hint = ValueHint::FilePath)]
+    #[clap(action, value_hint = ValueHint::FilePath)]
     experiments: Vec<PathBuf>,
 
     /// The statistical confidence required (0,100).
-    #[clap(short = 'c', long, default_value = "95.0")]
+    #[clap(action, short = 'c', long, default_value = "95.0")]
     confidence: f64,
 
     /// Write an SVG box plot to the given path.
-    #[clap(long, value_hint = ValueHint::FilePath, value_name = "PATH")]
+    #[clap(action, long, value_hint = ValueHint::FilePath, value_name = "PATH")]
     box_plot: Option<String>,
 }
 
