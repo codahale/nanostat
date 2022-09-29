@@ -2,7 +2,8 @@ name: Rust CI
 
 on:
   push:
-    branches: [ 'main' ]
+    branches:
+      - "main"
   pull_request:
 
 jobs:
@@ -15,50 +16,17 @@ jobs:
           - beta
     steps:
       - uses: actions/checkout@v3
-        name: "checkout"
+        name: "Checkout source"
       - uses: actions-rs/toolchain@v1.0.7
-        name: "install rust"
+        name: "Install Rust"
         with:
-          profile: minimal
+          profile: default
           toolchain: ${{ matrix.rust }}
           override: true
+      - uses: Swatinem/rust-cache@v2
+        name: "Cache dependencies"
       - uses: actions-rs/cargo@v1.0.3
-        name: 'build'
+        name: "Build, test, and check"
         with:
-          command: build
-          args: --all-targets ${{ matrix.features }}
-      - uses: actions-rs/cargo@v1.0.3
-        name: 'test'
-        with:
-          command: test
-          args: ${{ matrix.features }}
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        name: "checkout"
-      - uses: actions-rs/toolchain@v1.0.7
-        name: "install rust"
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-          components: rustfmt, clippy
-      - uses: actions-rs/cargo@v1.0.3
-        name: 'rustfmt'
-        with:
-          command: fmt
-          args: --all -- --check
-      - uses: actions-rs/cargo@v1.0.3
-        name: 'clippy'
-        if: always()
-        with:
-          command: clippy
-          args: --all-features -- -D warnings
-      - uses: actions-rs/cargo@v1.0.3
-        name: 'clippy-tests'
-        if: always()
-        with:
-          command: clippy
-          args: --all-features --tests --benches -- -D warnings
+          command: xtask
+          args: ci
